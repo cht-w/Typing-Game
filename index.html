@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Game</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <img src="images/play.png" alt="">
+    <!-- 音频文件在谷歌浏览器下无法自动播放，可以修改浏览器flag/autoplay配置，或者交互播放 -->
+    <audio src="media/bg.ogg" loop autoplay></audio> 
+    <!-- <div class='word_box'>
+        <span>M</span>
+    </div> -->
+    <script>
+        // 开关
+        let openImg = document.querySelector('img');
+        let audio = document.querySelector('audio');
+        let list  = [] ; // 保存所有的字母容器
+        // 开始游戏
+        openImg.onclick = function() {
+            this.style.display = 'none';
+            audio.play();
+            // 创建 容器对象
+            setInterval(()=> {
+                let b = new box();
+                b.fly();
+                list.push(b);
+            } , 3000)
+        }
+        // 封装一个数字容器对象
+        class box {
+            constructor() {
+                // 1. 创建 div 并设置样式
+                let oDiv = document.createElement('div');
+                oDiv.className = 'word_box';
+                oDiv.style.top = '1000px';
+                oDiv.style.left = Math.random() * 1500 + 'px';
+                // 2. 创建span并设置内容
+                let oSpan = document.createElement('span');
+                // 设置span中的字母为 随机字母
+                let key = this.getRandomCode()
+                oSpan.innerText = key;
+                // 为 容器添加一个类名，用于按下键盘字母删除 容器
+                oDiv.className = 'word_box ' + key
+                // 3. 将span添加到div中
+                oDiv.appendChild(oSpan);
+                // 4. 将div添加到body中
+                document.body.appendChild(oDiv);
+                // 将 oDiv 保存为 box对象的属性
+                this.oDiv = oDiv;
+            }
+
+            // 字母往上飘
+            fly() {
+                let offset = parseInt(this.oDiv.style.top);
+                // console.log(offset);
+                this.timer = setInterval(()=>{
+                    offset-= 30;
+                    if(offset <= -300) {
+                        this.delete();
+                    }
+                    this.oDiv.style.top = offset + 'px';
+                } , 200);
+            }
+            // 删除容器
+            delete(){
+                // 1.删除当前幽灵
+                document.body.removeChild(this.oDiv);
+                // 2.删除当前幽灵对应的定时器
+                clearInterval(this.timer)
+            }
+
+            // 生成随机字母
+            getRandomCode(){
+                let num =  Math.floor(Math.random() * (90 - 65 + 1) + 65);
+                return String.fromCharCode(num);
+            }
+        }
+        document.body.onkeydown = function (e) {
+            //console.log( e.keyCode);
+           let key = e.key.toUpperCase();
+         
+           // 获取类名为 key 的 容器
+           let oDivKey  = this.querySelector('.'+key);
+
+            //document.body.removeChild(oDivKey);
+            // 1.找到存放容器数组中的 容器对象的位置  返回索引值
+            let currentIndex = list.findIndex((currentVal)=> {
+                return currentVal.oDiv === oDivKey;
+            })
+            if(currentIndex === -1) return ;
+            // 2.通过索引找到数组中的对象
+            let currentOdiv  = list[currentIndex];
+            // 3. 通过对象的 delete方法删除  容器和定时器
+            currentOdiv.delete();
+            list.splice(currentIndex , 1);
+        }
+
+
+
+
+        // let num = getRandomIntInclusive(65,90);
+        // let charCode = String.fromCharCode(num);
+        // console.log(charCode);
+        // 获取随机数
+        // function getRandomIntInclusive(min, max) {
+        //     min = Math.ceil(min);
+        //     max = Math.floor(max);
+        //     return Math.floor(Math.random() * (max - min + 1) + min);
+        // }
+    </script>
+</body>
+</html>
